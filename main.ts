@@ -9,7 +9,7 @@ const prompt = require('prompt-sync')();
 const ROWS: number = 3;
 const COLS: number = 3;
 
-const SYMBOLS: { A: number, B: number, C: number, D: number} =  {
+const SYMBOL_COUNTS: { A: number, B: number, C: number, D: number} =  {
     A : 3,
     B : 4,
     C : 5,
@@ -38,7 +38,7 @@ const getDeposit = (): number => {
     
 }
 
-//function for getting Rows
+//function for getting Rows to be bet on
 const getRows = (): number => {
     while(true) {
         const rows: string = prompt("How many rows are you betting (1-3)?: ");
@@ -61,7 +61,7 @@ const getRows = (): number => {
 }
 
 //function for getting Rows
-const getBet = (): number => {
+const getBet = (rows: number): number => {
     while(true) {
         const bet: string = prompt("How much are you betting per line?: ");
 
@@ -70,23 +70,21 @@ const getBet = (): number => {
         const betNum: number = parseFloat(bet)
 
 
-        if (Number.isNaN(betNum) || betNum < 0)  {
-            console.log("Please input a valid deposit.");
+        if (Number.isNaN(betNum) || betNum < 0 || betNum * rows < 0)  {
+            console.log("Please input a valid bet. ");
             continue;
         } 
             
         return betNum; 
         
-    }  
-    
-    
+    }
 }
 
 let balance: number = 0;
 
 const deposit: number = getDeposit();
 const rows: number = getRows();
-const bet: number = getBet();
+const bet: number = getBet(rows);
 
 console.log(`You deposited ${deposit}`);
 console.log(`You are betting ${bet} on ${rows} rows`);
