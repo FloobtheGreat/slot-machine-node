@@ -163,7 +163,7 @@ const getNextStep = (): string => {
             console.log("Please input a valid choice.");
             continue;
         } 
-        return nextStep; 
+        return nextStep.toUpperCase(); 
     }  
     
     
@@ -183,8 +183,15 @@ while (true) {
     //console.log(`You deposited ${deposit}`);
     //console.log(`You are betting ${bet} on ${rows} rows`);
     //console.log (`You have a balance of ${balance}`)
-    for (let i = 0; i < spinResult.length; i++) {
-        console.log(spinResult[i])
+    for (const resultRow of spinResult) {
+        let output: string = "";
+        for (let i = 0; i < COLS; i++) {
+            output += resultRow[i];
+            if (i < 2) {
+                output += " | "
+            }
+        }        
+        console.log(output);
     }
 
     const winnings: number = getWinnings(spinResult, rows, bet, balance);
