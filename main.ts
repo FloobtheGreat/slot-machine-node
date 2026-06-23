@@ -13,14 +13,13 @@ type SymbolCount = {
     symbol: string;
     count: number;
     value: number;
-    multi: number;
 }
 
 const SYMBOL_COUNTS: SymbolCount[] = [
-    { symbol: "🍒", count: 8, value: 1, multi: 1},
-    { symbol: "🍋", count: 5, value: 5, multi: 2},
-    { symbol: "🍌", count: 4, value: 10, multi: 5},
-    { symbol: "💎", count: 3, value: 20, multi: 10},
+    { symbol: "🍒", count: 8, value: 1},
+    { symbol: "🍋", count: 5, value: 5},
+    { symbol: "🍌", count: 4, value: 10},
+    { symbol: "💎", count: 3, value: 20},
 ];
 
 
@@ -121,6 +120,16 @@ const spinSlots = () => {
     return result;
 }
 
+//function for grabbing value by symbol
+const getValueBySymbol = (symbol: string): number => {
+    for (const item of SYMBOL_COUNTS) {
+        if (item.symbol === symbol) {
+            return item.value;
+        }
+    }
+    return 0;
+}
+
 // Function for determining winnings.
 const getWinnings = (spin: string[][], rowsBet: number, betIn: number, balanceIn: number): number => {
     let linesWon: number = 0;
@@ -130,14 +139,14 @@ const getWinnings = (spin: string[][], rowsBet: number, betIn: number, balanceIn
     for (const [i, row] of spin.entries()) {
         if (row[0] === row[1] && row[1] === row[2] && i < rowsBet) {
             linesWon++
-
+            winnings = betIn * getValueBySymbol(row[0]!);
         }
 
     }
     if (linesWon === 0) {
         winnings -= rowsBet*betIn;
     }
-    console.log(`You won on ${linesWon} lines`);
+    console.log(`You won ${winnings} on ${linesWon} lines`);
     return winnings;
 }
 
