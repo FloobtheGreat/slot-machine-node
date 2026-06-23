@@ -37,8 +37,6 @@ const getDeposit = (): number => {
             console.log("Please input a valid deposit.");
             continue;
         } 
-
-        balance += depositNum;
         return depositNum; 
     }  
     
@@ -68,7 +66,7 @@ const getRows = (): number => {
 }
 
 //function for getting Rows
-const getBet = (rows: number): number => {
+const getBet = (rows: number, balance: number): number => {
     while(true) {
         const bet: string = prompt("How much are you betting per line?: ");
 
@@ -76,8 +74,9 @@ const getBet = (rows: number): number => {
 
         const betNum: number = parseFloat(bet)
 
+        const totalBet: number = betNum * rows;
 
-        if (Number.isNaN(betNum) || betNum < 0 || betNum * rows < 0)  {
+        if (Number.isNaN(totalBet) || totalBet <= 0 || totalBet > balance)  {
             console.log("Please input a valid bet. ");
             continue;
         } 
@@ -123,13 +122,15 @@ const spinSlots = () => {
 let balance: number = 0;
 
 const deposit: number = getDeposit();
+balance += deposit;
+console.log(`Your current balance is: ${balance}`);
 const rows: number = getRows();
-const bet: number = getBet(rows);
+const bet: number = getBet(rows, balance);
 const spinResult: string[][] = spinSlots();
 
-console.log(`You deposited ${deposit}`);
-console.log(`You are betting ${bet} on ${rows} rows`);
-console.log (`You have a balance of ${balance}`)
+//console.log(`You deposited ${deposit}`);
+//console.log(`You are betting ${bet} on ${rows} rows`);
+//console.log (`You have a balance of ${balance}`)
 for (let i = 0; i < spinResult.length; i++) {
     console.log(spinResult[i])
 }
