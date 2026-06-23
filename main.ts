@@ -12,13 +12,15 @@ const COLS: number = 3;
 type SymbolCount = {
     symbol: string;
     count: number;
+    value: number;
+    multi: number;
 }
 
 const SYMBOL_COUNTS: SymbolCount[] = [
-    { symbol: "🍒", count: 8},
-    { symbol: "🍋", count: 5},
-    { symbol: "🍌", count: 4},
-    { symbol: "💎", count: 3},
+    { symbol: "🍒", count: 8, value: 1, multi: 1},
+    { symbol: "🍋", count: 5, value: 5, multi: 2},
+    { symbol: "🍌", count: 4, value: 10, multi: 5},
+    { symbol: "💎", count: 3, value: 20, multi: 10},
 ];
 
 
@@ -65,8 +67,8 @@ const getRows = (): number => {
     
 }
 
-//function for getting Rows
-const getBet = (rows: number, balance: number): number => {
+//function for getting the per line bet
+const getBet = (rowsIn: number, balanceIn: number): number => {
     while(true) {
         const bet: string = prompt("How much are you betting per line?: ");
 
@@ -74,9 +76,9 @@ const getBet = (rows: number, balance: number): number => {
 
         const betNum: number = parseFloat(bet)
 
-        const totalBet: number = betNum * rows;
+        const totalBet: number = betNum * rowsIn;
 
-        if (Number.isNaN(totalBet) || totalBet <= 0 || totalBet > balance)  {
+        if (Number.isNaN(totalBet) || totalBet <= 0 || totalBet > balanceIn)  {
             console.log("Please input a valid bet. ");
             continue;
         } 
@@ -115,22 +117,79 @@ const spinSlots = () => {
         }
         result.push(row);
     }
-
+    
     return result;
 }
 
+// Function for determining winnings.
+const getWinnings = (spin: string[][], rowsBet: number, betIn: number, balanceIn: number): number => {
+    let linesWon: number = 0;
+    let winnings = 0;
+    //const allSame = <T>(arr: readonly T[]): boolean => arr.every(value => value === arr[0]);
+    
+    for (const [i, row] of spin.entries()) {
+        if (row[0] === row[1] && row[1] === row[2] && i < rowsBet) {
+            linesWon++
+
+        }
+
+    }
+    if (linesWon === 0) {
+        winnings -= rowsBet*betIn;
+    }
+    console.log(`You won on ${linesWon} lines`);
+    return winnings;
+}
+
+
+//function for getting deposits
+const getNextStep = (): string => {
+    while(true) {
+        const nextStep: string = prompt("Would you like to play again? (y/n): ");
+        
+        if (nextStep === null) continue;
+
+
+        if ( nextStep.toUpperCase() !== "Y" && nextStep.toUpperCase() !== "N") {
+            console.log("Please input a valid choice.");
+            continue;
+        } 
+        return nextStep; 
+    }  
+    
+    
+}
+
+
 let balance: number = 0;
 
-const deposit: number = getDeposit();
-balance += deposit;
-console.log(`Your current balance is: ${balance}`);
-const rows: number = getRows();
-const bet: number = getBet(rows, balance);
-const spinResult: string[][] = spinSlots();
+while (true) {
+    const deposit: number = getDeposit();
+    balance += deposit;
+    console.log(`Your current balance is: ${balance}`);
+    const rows: number = getRows();
+    const bet: number = getBet(rows, balance);
+    const spinResult: string[][] = spinSlots();
 
-//console.log(`You deposited ${deposit}`);
-//console.log(`You are betting ${bet} on ${rows} rows`);
-//console.log (`You have a balance of ${balance}`)
-for (let i = 0; i < spinResult.length; i++) {
-    console.log(spinResult[i])
+    //console.log(`You deposited ${deposit}`);
+    //console.log(`You are betting ${bet} on ${rows} rows`);
+    //console.log (`You have a balance of ${balance}`)
+    for (let i = 0; i < spinResult.length; i++) {
+        console.log(spinResult[i])
+    }
+
+    const winnings: number = getWinnings(spinResult, rows, bet, balance);
+    balance += winnings
+
+    console.log(`Your current balance is ${balance}`);
+
+    if (balance > 0) {
+        const decision = getNextStep();
+        if (decision === "N") 
+            console.log("Thanks for playing!");
+            break;
+    } else {
+        console.log("Thanks for playing!");
+        break;
+    }    
 }
