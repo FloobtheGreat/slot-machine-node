@@ -5,6 +5,7 @@
 
 
 const prompt = require('prompt-sync')();
+// Optional Fix: prompt-sync usually won't return null, so the null checks below may be unnecessary.
 
 const ROWS: number = 3;
 const COLS: number = 3;
@@ -34,6 +35,7 @@ const getDeposit = (): number => {
         const depositNum: number = parseFloat(deposit)
 
 
+        // Optional Fix: require depositNum > 0 if a zero deposit should be rejected.
         if (Number.isNaN(depositNum) || depositNum < 0) {
             console.log("Please input a valid deposit.");
             continue;
@@ -51,10 +53,13 @@ const getRows = (): number => {
 
         if (rows === null) continue;
 
+        // Optional Fix: use integer validation here if rows should only accept whole numbers.
         const rowsNum: number = parseFloat(rows)
 
 
+        // Fix: reject 0 here so row count stays within the stated 1-3 range.
         if (Number.isNaN(rowsNum) || rowsNum < 0 || rowsNum > 3)  {
+            // Optional Fix: update this message so it mentions rows instead of deposit.
             console.log("Please input a valid deposit.");
             continue;
         } 
@@ -73,6 +78,7 @@ const getBet = (rowsIn: number, balanceIn: number): number => {
 
         if (bet === null) continue;
 
+        // Optional Fix: use integer validation here if bet per line should be a whole number.
         const betNum: number = parseFloat(bet)
 
         const totalBet: number = betNum * rowsIn;
@@ -131,6 +137,7 @@ const getValueBySymbol = (symbol: string): number => {
 }
 
 // Function for determining winnings.
+// Optional Fix: balanceIn is unused here, so remove it or use it in the payout calculation.
 const getWinnings = (spin: string[][], rowsBet: number, betIn: number, balanceIn: number): number => {
     let linesWon: number = 0;
     let winnings = 0;
@@ -139,6 +146,7 @@ const getWinnings = (spin: string[][], rowsBet: number, betIn: number, balanceIn
     for (const [i, row] of spin.entries()) {
         if (row[0] === row[1] && row[1] === row[2] && i < rowsBet) {
             linesWon++
+            // Fix: accumulate winnings per winning line and ensure the spin cost is handled every round.
             winnings = betIn * getValueBySymbol(row[0]!);
         }
 
@@ -201,6 +209,7 @@ while (true) {
 
     if (balance > 0) {
         const decision = getNextStep();
+        // Fix: add braces here so break only runs when the player chooses N.
         if (decision === "N") 
             console.log("Thanks for playing!");
             break;
