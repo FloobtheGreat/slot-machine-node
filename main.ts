@@ -144,9 +144,6 @@ const getWinnings = (spin: string[][], rowsBet: number, betIn: number): number =
         }
 
     }
-    if (linesWon === 0) {
-        winnings -= rowsBet*betIn;
-    }
     console.log(`You won ${winnings} on ${linesWon} lines`);
     return winnings;
 }
