@@ -17,7 +17,7 @@ type SymbolCount = {
 }
 
 const SYMBOL_COUNTS: SymbolCount[] = [
-    { symbol: "🍒", count: 8, value: 1},
+    { symbol: "🍒", count: 20, value: 1},
     { symbol: "🍋", count: 5, value: 5},
     { symbol: "🍌", count: 4, value: 10},
     { symbol: "💎", count: 3, value: 20},
@@ -29,8 +29,6 @@ const SYMBOL_COUNTS: SymbolCount[] = [
 const getDeposit = (): number => {
     while(true) {
         const deposit: string = prompt("How much would you like to deposit: ");
-        
-        if (deposit === null) continue;
 
         const depositNum: number = parseFloat(deposit)
 
@@ -51,16 +49,13 @@ const getRows = (): number => {
     while(true) {
         const rows: string = prompt("How many rows are you betting (1-3)?: ");
 
-        if (rows === null) continue;
-
         // Optional Fix: use integer validation here if rows should only accept whole numbers.
         const rowsNum: number = parseFloat(rows)
 
 
-        // Fix: reject 0 here so row count stays within the stated 1-3 range.
-        if (Number.isNaN(rowsNum) || rowsNum < 0 || rowsNum > 3)  {
-            // Optional Fix: update this message so it mentions rows instead of deposit.
-            console.log("Please input a valid deposit.");
+        
+        if (Number.isNaN(rowsNum) || rowsNum <= 0 || rowsNum > 3)  {
+            console.log("Please input (1-3).");
             continue;
         } 
             
@@ -75,8 +70,6 @@ const getRows = (): number => {
 const getBet = (rowsIn: number, balanceIn: number): number => {
     while(true) {
         const bet: string = prompt("How much are you betting per line?: ");
-
-        if (bet === null) continue;
 
         // Optional Fix: use integer validation here if bet per line should be a whole number.
         const betNum: number = parseFloat(bet)
@@ -138,16 +131,16 @@ const getValueBySymbol = (symbol: string): number => {
 
 // Function for determining winnings.
 // Optional Fix: balanceIn is unused here, so remove it or use it in the payout calculation.
-const getWinnings = (spin: string[][], rowsBet: number, betIn: number, balanceIn: number): number => {
+const getWinnings = (spin: string[][], rowsBet: number, betIn: number): number => {
     let linesWon: number = 0;
-    let winnings = 0;
+    let winnings: number = 0;
     //const allSame = <T>(arr: readonly T[]): boolean => arr.every(value => value === arr[0]);
     
     for (const [i, row] of spin.entries()) {
         if (row[0] === row[1] && row[1] === row[2] && i < rowsBet) {
             linesWon++
             // Fix: accumulate winnings per winning line and ensure the spin cost is handled every round.
-            winnings = betIn * getValueBySymbol(row[0]!);
+            winnings += betIn * getValueBySymbol(row[0]!);
         }
 
     }
@@ -178,19 +171,22 @@ const getNextStep = (): string => {
 }
 
 
+
 let balance: number = 0;
 
 while (true) {
-    const deposit: number = getDeposit();
-    balance += deposit;
+    console.clear();
     console.log(`Your current balance is: ${balance}`);
+    const deposit: number = getDeposit();
+    balance += deposit;    
     const rows: number = getRows();
     const bet: number = getBet(rows, balance);
+    balance -= rows * bet;
     const spinResult: string[][] = spinSlots();
 
     //console.log(`You deposited ${deposit}`);
-    //console.log(`You are betting ${bet} on ${rows} rows`);
-    //console.log (`You have a balance of ${balance}`)
+    console.log(`You are betting ${bet} on ${rows} rows`);
+    console.log (`You have a balance of ${balance}`)
     for (const resultRow of spinResult) {
         let output: string = "";
         for (let i = 0; i < COLS; i++) {
@@ -202,19 +198,19 @@ while (true) {
         console.log(output);
     }
 
-    const winnings: number = getWinnings(spinResult, rows, bet, balance);
+    const winnings: number = getWinnings(spinResult, rows, bet);
     balance += winnings
 
     console.log(`Your current balance is ${balance}`);
 
     if (balance > 0) {
         const decision = getNextStep();
-        // Fix: add braces here so break only runs when the player chooses N.
-        if (decision === "N") 
+        if (decision === "N") {
             console.log("Thanks for playing!");
             break;
+        }
     } else {
-        console.log("Thanks for playing!");
+        console.log("Game over! Thanks for playing!");
         break;
     }    
 }
